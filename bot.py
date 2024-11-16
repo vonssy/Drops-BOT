@@ -63,72 +63,152 @@ class Drops:
         else:
             raise ValueError("User data not found in query.")
         
-    def sessions(self, query: str):
+    def sessions(self, query: str, retries=3):
         url = "https://api.drops-tgcoin.com/sessions"
         data = json.dumps({'encodedMessage':query})
         self.headers.update({ 
             'Content-Type': 'application/json'
         })
 
-        response = self.session.post(url,headers=self.headers, data=data)
-        if response.status_code == 200:
-            return response.json()['token']
-        else:
-            return None
+        attempt = 0
+        while attempt < retries:
+            try:
+                response = self.session.post(url,headers=self.headers, data=data, timeout=10)
+                if response.status_code == 200:
+                    return response.json()['token']
+                else:
+                    return None
+            except (requests.Timeout, requests.ConnectionError) as e:
+                print(
+                    f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
+                    f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
+                    f"{Fore.RED + Style.BRIGHT}Request Timeout.{Style.RESET_ALL}"
+                    f"{Fore.WHITE + Style.BRIGHT} Retrying {attempt+1}/{retries} {Style.RESET_ALL}",
+                    end="\r",
+                    flush=True
+                )
+            attempt += 1
+            time.sleep(2)
+
+        return None
         
-    def sign_up(self, token: str):
+    def sign_up(self, token: str, retries=3):
         url = "https://api.drops-tgcoin.com/users/sign-up-rewards"
         self.headers.update({ 
             'Content-Type': 'application/json',
             'X-Auth-Token': token
         })
 
-        response = self.session.post(url,headers=self.headers)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            return None
+        attempt = 0
+        while attempt < retries:
+            try:
+                response = self.session.post(url,headers=self.headers, timeout=10)
+                if response.status_code == 200:
+                    return response.json()
+                else:
+                    return None
+            except (requests.Timeout, requests.ConnectionError) as e:
+                print(
+                    f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
+                    f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
+                    f"{Fore.RED + Style.BRIGHT}Request Timeout.{Style.RESET_ALL}"
+                    f"{Fore.WHITE + Style.BRIGHT} Retrying {attempt+1}/{retries} {Style.RESET_ALL}",
+                    end="\r",
+                    flush=True
+                )
+            attempt += 1
+            time.sleep(2)
+
+        return None
         
-    def rewards(self, token: str):
+    def rewards(self, token: str, retries=3):
         url = "https://api.drops-tgcoin.com/drops/claim/rewards"
         self.headers.update({ 
             'Content-Type': 'application/json',
             'X-Auth-Token': token
         })
 
-        response = self.session.get(url,headers=self.headers)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            return None
+        attempt = 0
+        while attempt < retries:
+            try:
+                response = self.session.get(url,headers=self.headers, timeout=10)
+                if response.status_code == 200:
+                    return response.json()
+                else:
+                    return None
+            except (requests.Timeout, requests.ConnectionError) as e:
+                print(
+                    f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
+                    f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
+                    f"{Fore.RED + Style.BRIGHT}Request Timeout.{Style.RESET_ALL}"
+                    f"{Fore.WHITE + Style.BRIGHT} Retrying {attempt+1}/{retries} {Style.RESET_ALL}",
+                    end="\r",
+                    flush=True
+                )
+            attempt += 1
+            time.sleep(2)
+
+        return None
         
-    def claim_farming(self, token: str):
+    def claim_farming(self, token: str, retries=3):
         url = "https://api.drops-tgcoin.com/drops/claim/rewards"
         self.headers.update({ 
             'Content-Type': 'application/json',
             'X-Auth-Token': token
         })
 
-        response = self.session.post(url,headers=self.headers)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            return None
+        attempt = 0
+        while attempt < retries:
+            try:
+                response = self.session.post(url,headers=self.headers, timeout=10)
+                if response.status_code == 200:
+                    return response.json()
+                else:
+                    return None
+            except (requests.Timeout, requests.ConnectionError) as e:
+                print(
+                    f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
+                    f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
+                    f"{Fore.RED + Style.BRIGHT}Request Timeout.{Style.RESET_ALL}"
+                    f"{Fore.WHITE + Style.BRIGHT} Retrying {attempt+1}/{retries} {Style.RESET_ALL}",
+                    end="\r",
+                    flush=True
+                )
+            attempt += 1
+            time.sleep(2)
+
+        return None
         
-    def tasks(self, token: str):
+    def tasks(self, token: str, retries=3):
         url = "https://api.drops-tgcoin.com/tasks"
         self.headers.update({ 
             'Content-Type': 'application/json',
             'X-Auth-Token': token
         })
 
-        response = self.session.get(url,headers=self.headers)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            return None
+        attempt = 0
+        while attempt < retries:
+            try:
+                response = self.session.get(url,headers=self.headers, timeout=10)
+                if response.status_code == 200:
+                    return response.json()
+                else:
+                    return None
+            except (requests.Timeout, requests.ConnectionError) as e:
+                print(
+                    f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
+                    f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
+                    f"{Fore.RED + Style.BRIGHT}Request Timeout.{Style.RESET_ALL}"
+                    f"{Fore.WHITE + Style.BRIGHT} Retrying {attempt+1}/{retries} {Style.RESET_ALL}",
+                    end="\r",
+                    flush=True
+                )
+            attempt += 1
+            time.sleep(2)
+
+        return None
         
-    def verify_tasks(self, token: str, task_id: int):
+    def verify_tasks(self, token: str, task_id: int, retries=3):
         url = f"https://api.drops-tgcoin.com/tasks/{task_id}/verify"
         self.headers.update({ 
             'Content-Type': 'application/json',
@@ -136,11 +216,27 @@ class Drops:
             'X-Auth-Token': token
         })
 
-        response = self.session.post(url,headers=self.headers)
-        if response.status_code == 201:
-            return True
-        else:
-            return False
+        attempt = 0
+        while attempt < retries:
+            try:
+                response = self.session.get(url,headers=self.headers, timeout=10)
+                if response.status_code in [200, 201]:
+                    return True
+                else:
+                    return False
+            except (requests.Timeout, requests.ConnectionError) as e:
+                print(
+                    f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
+                    f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
+                    f"{Fore.RED + Style.BRIGHT}Request Timeout.{Style.RESET_ALL}"
+                    f"{Fore.WHITE + Style.BRIGHT} Retrying {attempt+1}/{retries} {Style.RESET_ALL}",
+                    end="\r",
+                    flush=True
+                )
+            attempt += 1
+            time.sleep(2)
+
+        return None
         
     def process_query(self, query: str):
 
@@ -244,13 +340,14 @@ class Drops:
                     f"{Fore.GREEN + Style.BRIGHT}Account's Total: {Style.RESET_ALL}"
                     f"{Fore.WHITE + Style.BRIGHT}{len(queries)}{Style.RESET_ALL}"
                 )
-                self.log(f"{Fore.CYAN + Style.BRIGHT}-------------------------------------------------------------------{Style.RESET_ALL}")
+                self.log(f"{Fore.CYAN + Style.BRIGHT}-{Style.RESET_ALL}"*75)
                 
                 for query in queries:
                     query = query.strip()
                     if query:
                         self.process_query(query)
-                        self.log(f"{Fore.CYAN + Style.BRIGHT}-------------------------------------------------------------------{Style.RESET_ALL}")
+                        self.log(f"{Fore.CYAN + Style.BRIGHT}-{Style.RESET_ALL}"*75)
+                        time.sleep(3)
 
                 seconds = 1800
                 while seconds > 0:
