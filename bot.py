@@ -74,7 +74,7 @@ class Drops:
             try:
                 response = self.session.post(url, headers=self.headers, data=data, timeout=10)
                 response.raise_for_status()
-                return response.json()['token']
+                return response.json()
             except (requests.RequestException, requests.Timeout, ValueError) as e:
                 if attempt < retries - 1:
                     print(
@@ -236,8 +236,8 @@ class Drops:
         
     def process_query(self, query: str):
         account = self.load_data(query)
-        token = self.user_sessions(query)
-        if not token:
+        sessions = self.user_sessions(query)
+        if not sessions:
             self.log(
                 f"{Fore.MAGENTA+Style.BRIGHT}[ Account{Style.RESET_ALL}"
                 f"{Fore.WHITE+Style.BRIGHT} {account}  {Style.RESET_ALL}"
@@ -246,9 +246,10 @@ class Drops:
             )
             return
 
-        if token:
-            user = self.user_rewards(token)
-            if not user:
+        if sessions:
+            token = sessions['token']
+            new_user = sessions['newUser']
+            if new_user:
                 signup = self.user_signup(token)
                 if signup:
                     self.log(
@@ -266,9 +267,17 @@ class Drops:
                         f"{Fore.MAGENTA+Style.BRIGHT} ]{Style.RESET_ALL}"
                     )
                     return
-
-                user = self.user_rewards(token)
-
+                
+            user = self.user_rewards(token)
+            if not user:
+                self.log(
+                    f"{Fore.MAGENTA+Style.BRIGHT}[ Account{Style.RESET_ALL}"
+                    f"{Fore.WHITE+Style.BRIGHT} {account}  {Style.RESET_ALL}"
+                    f"{Fore.RED+Style.BRIGHT}Query Id Isn't Valid{Style.RESET_ALL}"
+                    f"{Fore.MAGENTA+Style.BRIGHT} ]{Style.RESET_ALL}"
+                )
+                return
+            
             if user:
                 self.log(
                     f"{Fore.MAGENTA+Style.BRIGHT}[ Account{Style.RESET_ALL}"
