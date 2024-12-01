@@ -58,126 +58,123 @@ class Drops:
         if query:
             user_data_json = urllib.parse.unquote(query)
             user_data = json.loads(user_data_json)
-            first_name = user_data['first_name']
+            first_name = user_data.get('first_name', 'Unknown')
             return first_name
         else:
             raise ValueError("User data not found in query.")
         
-    def sessions(self, query: str, retries=3):
+    def user_sessions(self, query: str, retries=3):
         url = "https://api.drops-tgcoin.com/sessions"
         data = json.dumps({'encodedMessage':query})
-        self.headers.update({ 
+        self.headers.update({
             'Content-Type': 'application/json'
         })
 
-        attempt = 0
-        while attempt < retries:
+        for attempt in range(retries):
             try:
-                response = self.session.post(url,headers=self.headers, data=data, timeout=10)
-                if response.status_code == 200:
-                    return response.json()['token']
+                response = self.session.post(url, headers=self.headers, data=data, timeout=10)
+                response.raise_for_status()
+                return response.json()['token']
+            except (requests.RequestException, requests.Timeout, ValueError) as e:
+                if attempt < retries - 1:
+                    print(
+                        f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
+                        f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
+                        f"{Fore.RED + Style.BRIGHT}[ HTTP ERROR ]{Style.RESET_ALL}"
+                        f"{Fore.YELLOW + Style.BRIGHT} Retrying... {Style.RESET_ALL}"
+                        f"{Fore.WHITE + Style.BRIGHT}{attempt+1}/{retries}{Style.RESET_ALL}",
+                        end="\r",
+                        flush=True
+                    )
+                    time.sleep(2)
                 else:
                     return None
-            except (requests.Timeout, requests.ConnectionError) as e:
-                print(
-                    f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
-                    f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
-                    f"{Fore.RED + Style.BRIGHT}Request Timeout.{Style.RESET_ALL}"
-                    f"{Fore.WHITE + Style.BRIGHT} Retrying {attempt+1}/{retries} {Style.RESET_ALL}",
-                    end="\r",
-                    flush=True
-                )
-            attempt += 1
-            time.sleep(2)
-
-        return None
         
-    def sign_up(self, token: str, retries=3):
+    def user_signup(self, token: str, retries=3):
         url = "https://api.drops-tgcoin.com/users/sign-up-rewards"
         self.headers.update({ 
+            'Content-Length': '0',
             'Content-Type': 'application/json',
             'X-Auth-Token': token
         })
 
-        attempt = 0
-        while attempt < retries:
+        for attempt in range(retries):
             try:
-                response = self.session.post(url,headers=self.headers, timeout=10)
-                if response.status_code == 200:
-                    return response.json()
+                response = self.session.post(url, headers=self.headers, timeout=10)
+                response.raise_for_status()
+                return response.json()
+            except (requests.RequestException, requests.Timeout, ValueError) as e:
+                if attempt < retries - 1:
+                    print(
+                        f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
+                        f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
+                        f"{Fore.RED + Style.BRIGHT}[ HTTP ERROR ]{Style.RESET_ALL}"
+                        f"{Fore.YELLOW + Style.BRIGHT} Retrying... {Style.RESET_ALL}"
+                        f"{Fore.WHITE + Style.BRIGHT}{attempt+1}/{retries}{Style.RESET_ALL}",
+                        end="\r",
+                        flush=True
+                    )
+                    time.sleep(2)
                 else:
                     return None
-            except (requests.Timeout, requests.ConnectionError) as e:
-                print(
-                    f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
-                    f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
-                    f"{Fore.RED + Style.BRIGHT}Request Timeout.{Style.RESET_ALL}"
-                    f"{Fore.WHITE + Style.BRIGHT} Retrying {attempt+1}/{retries} {Style.RESET_ALL}",
-                    end="\r",
-                    flush=True
-                )
-            attempt += 1
-            time.sleep(2)
-
-        return None
         
-    def rewards(self, token: str, retries=3):
+    def user_rewards(self, token: str, retries=3):
         url = "https://api.drops-tgcoin.com/drops/claim/rewards"
         self.headers.update({ 
             'Content-Type': 'application/json',
             'X-Auth-Token': token
         })
 
-        attempt = 0
-        while attempt < retries:
+        for attempt in range(retries):
             try:
-                response = self.session.get(url,headers=self.headers, timeout=10)
-                if response.status_code == 200:
-                    return response.json()
+                response = self.session.get(url, headers=self.headers, timeout=10)
+                response.raise_for_status()
+                return response.json()
+            except (requests.RequestException, requests.Timeout, ValueError) as e:
+                if attempt < retries - 1:
+                    print(
+                        f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
+                        f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
+                        f"{Fore.RED + Style.BRIGHT}[ HTTP ERROR ]{Style.RESET_ALL}"
+                        f"{Fore.YELLOW + Style.BRIGHT} Retrying... {Style.RESET_ALL}"
+                        f"{Fore.WHITE + Style.BRIGHT}{attempt+1}/{retries}{Style.RESET_ALL}",
+                        end="\r",
+                        flush=True
+                    )
+                    time.sleep(2)
                 else:
                     return None
-            except (requests.Timeout, requests.ConnectionError) as e:
-                print(
-                    f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
-                    f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
-                    f"{Fore.RED + Style.BRIGHT}Request Timeout.{Style.RESET_ALL}"
-                    f"{Fore.WHITE + Style.BRIGHT} Retrying {attempt+1}/{retries} {Style.RESET_ALL}",
-                    end="\r",
-                    flush=True
-                )
-            attempt += 1
-            time.sleep(2)
-
-        return None
         
     def claim_farming(self, token: str, retries=3):
         url = "https://api.drops-tgcoin.com/drops/claim/rewards"
         self.headers.update({ 
+            'Content-Length': '0',
             'Content-Type': 'application/json',
             'X-Auth-Token': token
         })
 
-        attempt = 0
-        while attempt < retries:
+        for attempt in range(retries):
             try:
-                response = self.session.post(url,headers=self.headers, timeout=10)
-                if response.status_code == 200:
-                    return response.json()
+                response = self.session.post(url, headers=self.headers, timeout=10)
+                if response.status_code == 400:
+                    return None
+
+                response.raise_for_status()
+                return response.json()
+            except (requests.RequestException, requests.Timeout, ValueError) as e:
+                if attempt < retries - 1:
+                    print(
+                        f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
+                        f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
+                        f"{Fore.RED + Style.BRIGHT}[ HTTP ERROR ]{Style.RESET_ALL}"
+                        f"{Fore.YELLOW + Style.BRIGHT} Retrying... {Style.RESET_ALL}"
+                        f"{Fore.WHITE + Style.BRIGHT}{attempt+1}/{retries}{Style.RESET_ALL}",
+                        end="\r",
+                        flush=True
+                    )
+                    time.sleep(2)
                 else:
                     return None
-            except (requests.Timeout, requests.ConnectionError) as e:
-                print(
-                    f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
-                    f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
-                    f"{Fore.RED + Style.BRIGHT}Request Timeout.{Style.RESET_ALL}"
-                    f"{Fore.WHITE + Style.BRIGHT} Retrying {attempt+1}/{retries} {Style.RESET_ALL}",
-                    end="\r",
-                    flush=True
-                )
-            attempt += 1
-            time.sleep(2)
-
-        return None
         
     def tasks(self, token: str, retries=3):
         url = "https://api.drops-tgcoin.com/tasks"
@@ -186,146 +183,159 @@ class Drops:
             'X-Auth-Token': token
         })
 
-        attempt = 0
-        while attempt < retries:
+        for attempt in range(retries):
             try:
-                response = self.session.get(url,headers=self.headers, timeout=10)
-                if response.status_code == 200:
-                    return response.json()
+                response = self.session.get(url, headers=self.headers, timeout=10)
+                response.raise_for_status()
+                return response.json()
+            except (requests.RequestException, requests.Timeout, ValueError) as e:
+                if attempt < retries - 1:
+                    print(
+                        f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
+                        f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
+                        f"{Fore.RED + Style.BRIGHT}[ HTTP ERROR ]{Style.RESET_ALL}"
+                        f"{Fore.YELLOW + Style.BRIGHT} Retrying... {Style.RESET_ALL}"
+                        f"{Fore.WHITE + Style.BRIGHT}{attempt+1}/{retries}{Style.RESET_ALL}",
+                        end="\r",
+                        flush=True
+                    )
+                    time.sleep(2)
                 else:
                     return None
-            except (requests.Timeout, requests.ConnectionError) as e:
-                print(
-                    f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
-                    f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
-                    f"{Fore.RED + Style.BRIGHT}Request Timeout.{Style.RESET_ALL}"
-                    f"{Fore.WHITE + Style.BRIGHT} Retrying {attempt+1}/{retries} {Style.RESET_ALL}",
-                    end="\r",
-                    flush=True
-                )
-            attempt += 1
-            time.sleep(2)
-
-        return None
         
     def verify_tasks(self, token: str, task_id: int, retries=3):
         url = f"https://api.drops-tgcoin.com/tasks/{task_id}/verify"
         self.headers.update({ 
+            'Content-Length': '0',
             'Content-Type': 'application/json',
-            'Content-length': '0',
             'X-Auth-Token': token
         })
 
-        attempt = 0
-        while attempt < retries:
+        for attempt in range(retries):
             try:
-                response = self.session.get(url,headers=self.headers, timeout=10)
-                if response.status_code in [200, 201]:
-                    return True
-                else:
+                response = self.session.post(url, headers=self.headers, timeout=10)
+                if response.status_code == 400:
                     return False
-            except (requests.Timeout, requests.ConnectionError) as e:
-                print(
-                    f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
-                    f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
-                    f"{Fore.RED + Style.BRIGHT}Request Timeout.{Style.RESET_ALL}"
-                    f"{Fore.WHITE + Style.BRIGHT} Retrying {attempt+1}/{retries} {Style.RESET_ALL}",
-                    end="\r",
-                    flush=True
-                )
-            attempt += 1
-            time.sleep(2)
 
-        return None
+                response.raise_for_status()
+                return True
+            except (requests.RequestException, requests.Timeout, ValueError) as e:
+                if attempt < retries - 1:
+                    print(
+                        f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
+                        f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
+                        f"{Fore.RED + Style.BRIGHT}[ HTTP ERROR ]{Style.RESET_ALL}"
+                        f"{Fore.YELLOW + Style.BRIGHT} Retrying... {Style.RESET_ALL}"
+                        f"{Fore.WHITE + Style.BRIGHT}{attempt+1}/{retries}{Style.RESET_ALL}",
+                        end="\r",
+                        flush=True
+                    )
+                    time.sleep(2)
+                else:
+                    return None
         
     def process_query(self, query: str):
-
         account = self.load_data(query)
-
-        token = self.sessions(query)
+        token = self.user_sessions(query)
         if not token:
             self.log(
-                f"{Fore.MAGENTA+Style.BRIGHT}[ Query Account{Style.RESET_ALL}"
+                f"{Fore.MAGENTA+Style.BRIGHT}[ Account{Style.RESET_ALL}"
                 f"{Fore.WHITE+Style.BRIGHT} {account}  {Style.RESET_ALL}"
-                f"{Fore.RED+Style.BRIGHT}Isn't Valid{Style.RESET_ALL}"
+                f"{Fore.RED+Style.BRIGHT}Query Id Isn't Valid{Style.RESET_ALL}"
                 f"{Fore.MAGENTA+Style.BRIGHT} ]{Style.RESET_ALL}"
             )
             return
-        
-        user = self.rewards(token)
-        if not user:
-            signup = self.sign_up(token)
-            if signup:
+
+        if token:
+            user = self.user_rewards(token)
+            if not user:
+                signup = self.user_signup(token)
+                if signup:
+                    self.log(
+                        f"{Fore.MAGENTA+Style.BRIGHT}[ Account{Style.RESET_ALL}"
+                        f"{Fore.WHITE+Style.BRIGHT} {signup['user']['firstName']} {Style.RESET_ALL}"
+                        f"{Fore.MAGENTA+Style.BRIGHT}] [ Balance{Style.RESET_ALL}"
+                        f"{Fore.WHITE+Style.BRIGHT} {signup['user']['dropsAmount']:.2f} $DROPS {Style.RESET_ALL}"
+                        f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+                    )
+                else:
+                    self.log(
+                        f"{Fore.MAGENTA+Style.BRIGHT}[ Account{Style.RESET_ALL}"
+                        f"{Fore.WHITE+Style.BRIGHT} {account}  {Style.RESET_ALL}"
+                        f"{Fore.RED+Style.BRIGHT}Query Id Isn't Valid{Style.RESET_ALL}"
+                        f"{Fore.MAGENTA+Style.BRIGHT} ]{Style.RESET_ALL}"
+                    )
+                    return
+
+                user = self.user_rewards(token)
+
+            if user:
                 self.log(
                     f"{Fore.MAGENTA+Style.BRIGHT}[ Account{Style.RESET_ALL}"
-                    f"{Fore.WHITE+Style.BRIGHT} {signup['user']['firstName']} {Style.RESET_ALL}"
+                    f"{Fore.WHITE+Style.BRIGHT} {account} {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}] [ Balance{Style.RESET_ALL}"
-                    f"{Fore.WHITE+Style.BRIGHT} {signup['user']['dropsAmount']:.2f} $DROPS {Style.RESET_ALL}"
+                    f"{Fore.WHITE+Style.BRIGHT} {user['dropsAmount']:.2f} $DROPS {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
                 )
-            return
+                time.sleep(1)
 
-        if user:
-            self.log(
-                f"{Fore.MAGENTA+Style.BRIGHT}[ Account{Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT} {account} {Style.RESET_ALL}"
-                f"{Fore.MAGENTA+Style.BRIGHT}] [ Balance{Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT} {user['dropsAmount']:.2f} $DROPS {Style.RESET_ALL}"
-                f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
-            )
-        else:
-            self.log(
-                f"{Fore.MAGENTA+Style.BRIGHT}[ Account{Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT}  {Style.RESET_ALL}"
-                f"{Fore.RED+Style.BRIGHT}Is None{Style.RESET_ALL}"
-                f"{Fore.MAGENTA+Style.BRIGHT} ]{Style.RESET_ALL}"
-            )
+                claim_farm = self.claim_farming(token)
+                if claim_farm:
+                    self.log(
+                        f"{Fore.MAGENTA+Style.BRIGHT}[ Farming{Style.RESET_ALL}"
+                        f"{Fore.GREEN+Style.BRIGHT} Is Claimed {Style.RESET_ALL}"
+                        f"{Fore.MAGENTA+Style.BRIGHT}] [ Reward{Style.RESET_ALL}"
+                        f"{Fore.WHITE+Style.BRIGHT} {claim_farm['changeAmount']:.2f} $DROPS {Style.RESET_ALL}"
+                        f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+                    )
+                else:
+                    self.log(
+                        f"{Fore.MAGENTA+Style.BRIGHT}[ Farming{Style.RESET_ALL}"
+                        f"{Fore.YELLOW+Style.BRIGHT} Not Time to Claim {Style.RESET_ALL}"
+                        f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+                    )
+                time.sleep(1)
 
-        claim_farm = self.claim_farming(token)
-        if claim_farm:
-            self.log(
-                f"{Fore.MAGENTA+Style.BRIGHT}[ Farming{Style.RESET_ALL}"
-                f"{Fore.GREEN+Style.BRIGHT} Is Claimed {Style.RESET_ALL}"
-                f"{Fore.MAGENTA+Style.BRIGHT}] [ Reward{Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT} {claim_farm['changeAmount']:.2f} $DROPS {Style.RESET_ALL}"
-                f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
-            )
-        else:
-            self.log(
-                f"{Fore.MAGENTA+Style.BRIGHT}[ Farming{Style.RESET_ALL}"
-                f"{Fore.YELLOW+Style.BRIGHT} Is Already Claimed {Style.RESET_ALL}"
-                f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
-            )
+                tasks = self.tasks(token)
+                if tasks:
+                    completed = False
+                    for task in tasks:
+                        task_id = task['id']
 
-        tasks = self.tasks(token)
-        if tasks:
-            for task in tasks:
-                task_id = task['id']
+                        if task and task['active']:
+                            verify = self.verify_tasks(token, task_id)
+                            if verify:
+                                self.log(
+                                    f"{Fore.MAGENTA+Style.BRIGHT}[ Task{Style.RESET_ALL}"
+                                    f"{Fore.WHITE+Style.BRIGHT} {task['title']} {Style.RESET_ALL}"
+                                    f"{Fore.GREEN+Style.BRIGHT}Is Completed{Style.RESET_ALL}"
+                                    f"{Fore.MAGENTA+Style.BRIGHT} ] [ Reward{Style.RESET_ALL}"
+                                    f"{Fore.WHITE+Style.BRIGHT} {task['rewardDrops']} $DROPS {Style.RESET_ALL}"
+                                    f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+                                )
+                            else:
+                                self.log(
+                                    f"{Fore.MAGENTA+Style.BRIGHT}[ Task{Style.RESET_ALL}"
+                                    f"{Fore.WHITE+Style.BRIGHT} {task['title']} {Style.RESET_ALL}"
+                                    f"{Fore.RED+Style.BRIGHT}Isn't Completed{Style.RESET_ALL}"
+                                    f"{Fore.MAGENTA+Style.BRIGHT} ]{Style.RESET_ALL}"
+                                )
+                        else:
+                            completed = True
 
-                if task and task['active']:
-                    verify = self.verify_tasks(token, task_id)
-                    if verify:
-                        self.log(
+                    if completed:
+                            self.log(
                             f"{Fore.MAGENTA+Style.BRIGHT}[ Task{Style.RESET_ALL}"
-                            f"{Fore.WHITE+Style.BRIGHT} {task['title']} {Style.RESET_ALL}"
-                            f"{Fore.GREEN+Style.BRIGHT}Is Completed{Style.RESET_ALL}"
-                            f"{Fore.MAGENTA+Style.BRIGHT} ] [ Reward{Style.RESET_ALL}"
-                            f"{Fore.WHITE+Style.BRIGHT} {task['rewardDrops']} $DROPS {Style.RESET_ALL}"
+                            f"{Fore.GREEN+Style.BRIGHT} Is Completed {Style.RESET_ALL}"
                             f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
                         )
-                    else:
-                        self.log(
-                            f"{Fore.MAGENTA+Style.BRIGHT}[ Task{Style.RESET_ALL}"
-                            f"{Fore.WHITE+Style.BRIGHT} {task['title']} {Style.RESET_ALL}"
-                            f"{Fore.RED+Style.BRIGHT}Isn't Completed{Style.RESET_ALL}"
-                            f"{Fore.MAGENTA+Style.BRIGHT} ]{Style.RESET_ALL}"
-                        )
-        else:
-            self.log(
-                f"{Fore.MAGENTA+Style.BRIGHT}[ Task{Style.RESET_ALL}"
-                f"{Fore.YELLOW+Style.BRIGHT} Is None {Style.RESET_ALL}"
-                f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
-            )
+
+                else:
+                    self.log(
+                        f"{Fore.MAGENTA+Style.BRIGHT}[ Task{Style.RESET_ALL}"
+                        f"{Fore.GREEN+Style.BRIGHT} Is Completed {Style.RESET_ALL}"
+                        f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+                    )
 
     def main(self):
         try:
